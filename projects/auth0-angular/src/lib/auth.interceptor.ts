@@ -92,7 +92,15 @@ export class AuthHttpInterceptor implements HttpInterceptor {
 
     return uri;
   }
-
+  
+  /**
+   * Strips the domain from the given uri if the value to check is a path
+   * @param uri The uri to remove the domain from
+   */
+  stripDomainFromIfValueIsPath(uri, value) {
+    return value.startsWith('http')?uri:uri.replace(/http[s]?:[/]+[^/]+/, '');
+  }
+  
   /**
    * Determines whether the specified route can have an access token attached to it, based on matching the HTTP request against
    * the interceptor route configuration.
@@ -117,7 +125,7 @@ export class AuthHttpInterceptor implements HttpInterceptor {
       // If the URL ends with an asterisk, match using startsWith.
       return (
         value.indexOf('*') === value.length - 1 &&
-        request.url.startsWith(value.substr(0, value.length - 1))
+        stripDomainFromIfValueIsPath(request.url, value).startsWith(value.substr(0, value.length - 1))
       );
     };
 
